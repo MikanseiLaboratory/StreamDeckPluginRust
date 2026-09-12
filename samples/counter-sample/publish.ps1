@@ -57,11 +57,22 @@ try {
     npm run build
     Pop-Location
 
-    Publish-Target "x86_64-pc-windows-msvc" "win-x64" "$pluginId.exe"
+    if ($IsWindows -or $env:OS -like "*Windows*") {
+        Publish-Target "x86_64-pc-windows-msvc" "win-x64" "$pluginId.exe"
+    }
     foreach ($pair in @(
         @{ Target = "aarch64-apple-darwin"; Rid = "osx-arm64"; Name = $pluginId },
         @{ Target = "x86_64-apple-darwin"; Rid = "osx-x64"; Name = $pluginId }
     )) {
+        if (-not $IsMacOS) {
+            $placeholder = Join-Path $pluginDir "bin\$($pair.Rid)\$($pair.Name)"
+            New-Item -ItemType Directory -Force -Path (Split-Path $placeholder) | Out-Null
+            if (-not (Test-Path $placeholder)) {
+                New-Item -ItemType File -Path $placeholder | Out-Null
+            }
+            Write-Host "Skipping $($pair.Target): macOS binaries are built on macOS"
+            continue
+        }
         try {
             Publish-Target $pair.Target $pair.Rid $pair.Name
         }
@@ -114,6 +125,8 @@ try {
             & streamdeck restart $pluginId
         }
     }
+
+    $global:LASTEXITCODE = 0
 }
 finally {
     Pop-Location
