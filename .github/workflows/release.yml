@@ -42,12 +42,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Plan crates.io publish
+        id: plan
+        run: |
+          set -euo pipefail
+          version=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.name=="streamdeck-plugin") | .version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          needed=()
+          for crate in streamdeck-plugin-protocol streamdeck-plugin-macros streamdeck-plugin; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' \
+              -A "StreamDeckPluginRust-release (https://github.com/MikanseiLaboratory/StreamDeckPluginRust)" \
+              "https://crates.io/api/v1/crates/${crate}/${version}")
+            case "$code" in
+              200)
+                echo "$crate $version already on crates.io"
+                ;;
+              404)
+                needed+=("$crate")
+                ;;
+              *)
+                echo "unexpected HTTP $code for $crate@$version"
+                exit 1
+                ;;
+            esac
+          done
+          echo "crates=${needed[*]}" >> "$GITHUB_OUTPUT"
+          if [ ${#needed[@]} -eq 0 ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: rust-lang/crates-io-auth-action@v1
         id: auth
+        if: steps.plan.outputs.publish == 'true'
       - name: Publish crates in dependency order
+        if: steps.plan.outputs.publish == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
         run: |
-          cargo publish -p streamdeck-plugin-protocol
-          cargo publish -p streamdeck-plugin-macros
-          cargo publish -p streamdeck-plugin
+          set -euo pipefail
+          for crate in ${{ steps.plan.outputs.crates }}; do
+            cargo publish -p "$crate"
+          done
