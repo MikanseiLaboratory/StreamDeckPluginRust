@@ -15,7 +15,15 @@ publish_target() {
   rustup target add "$target"
   cargo build -p counter-sample --release --bin counter_sample_plugin --target "$target"
   mkdir -p "$PLUGIN_DIR/bin/$rid"
-  src=$(find "$REPO_ROOT/target/$target/release" -maxdepth 1 -name 'counter_sample_plugin*' | head -n 1)
+  if [[ "$name" == *.exe ]]; then
+    src="$REPO_ROOT/target/$target/release/counter_sample_plugin.exe"
+  else
+    src="$REPO_ROOT/target/$target/release/counter_sample_plugin"
+  fi
+  if [ ! -f "$src" ]; then
+    echo "built binary not found: $src" >&2
+    return 1
+  fi
   cp "$src" "$PLUGIN_DIR/bin/$rid/$name"
 }
 

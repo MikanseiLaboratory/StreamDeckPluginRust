@@ -36,11 +36,12 @@ function Publish-Target([string]$target, [string]$ridFolder, [string]$fileName) 
     $out = Join-Path $pluginDir "bin\$ridFolder"
     New-Item -ItemType Directory -Force -Path $out | Out-Null
     $built = Join-Path $repoRoot "target\$target\release"
-    $src = Get-ChildItem $built -Filter "counter_sample_plugin*" | Select-Object -First 1
-    if (-not $src) {
-        throw "built binary not found in $built"
+    $srcName = if ($fileName.EndsWith(".exe")) { "counter_sample_plugin.exe" } else { "counter_sample_plugin" }
+    $src = Join-Path $built $srcName
+    if (-not (Test-Path $src)) {
+        throw "built binary not found: $src"
     }
-    Copy-Item -Force $src.FullName (Join-Path $out $fileName)
+    Copy-Item -Force $src (Join-Path $out $fileName)
 }
 
 Push-Location $repoRoot
