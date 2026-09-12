@@ -1,0 +1,21 @@
+[package]
+name = "streamdeck-plugin-macros"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+description = "Proc-macros for streamdeck-plugin ([#streamdeck_action])."
+readme = "README.md"
+keywords = ["streamdeck", "elgato", "plugin", "macros"]
+categories = ["development-tools::procedural-macro-helpers"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2.workspace = true
+quote.workspace = true
+syn.workspace = true

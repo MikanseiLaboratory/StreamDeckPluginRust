@@ -1,0 +1,62 @@
+{
+  "UUID": "dev.flowingspdg.countersample.rust",
+  "Name": "Counter Sample (Rust)",
+  "Author": "FlowingSPDG",
+  "Description": "Sample Stream Deck plugin built with streamdeck-plugin.",
+  "Version": "0.1.0.0",
+  "Icon": "imgs/plugin",
+  "Category": "Counter Sample (Rust)",
+  "CategoryIcon": "imgs/plugin",
+  "CodePath": "bin/win-x64/dev.flowingspdg.countersample.rust.exe",
+  "CodePathMac": "bin/osx-arm64/dev.flowingspdg.countersample.rust",
+  "PropertyInspectorPath": "ui/index.html",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.5"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    },
+    {
+      "Platform": "mac",
+      "MinimumVersion": "12"
+    }
+  ],
+  "Actions": [
+    {
+      "UUID": "dev.flowingspdg.countersample.rust.counter",
+      "Name": "Shared Counter",
+      "Icon": "imgs/action",
+      "Tooltip": "Increments a plugin-wide counter.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/key",
+          "TitleAlignment": "middle",
+          "FontSize": 11
+        }
+      ]
+    },
+    {
+      "UUID": "dev.flowingspdg.countersample.rust.dial",
+      "Name": "Shared Counter Dial",
+      "Icon": "imgs/action",
+      "Tooltip": "Rotates the shared counter on Stream Deck +.",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1"
+      },
+      "States": [
+        {
+          "Image": "imgs/key"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+[package]
+name = "streamdeck-plugin"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+description = "High-DX Stream Deck plugin framework for Rust."
+readme = "../../README.md"
+keywords = ["streamdeck", "elgato", "plugin", "sdk"]
+categories = ["api-bindings"]
+
+[features]
+default = ["macros"]
+macros = ["dep:streamdeck-plugin-macros"]
+typegen = ["dep:ts-rs"]
+
+[dependencies]
+async-trait.workspace = true
+futures.workspace = true
+inventory.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+streamdeck-plugin-macros = { path = "../streamdeck-plugin-macros", version = "0.1.0", optional = true }
+streamdeck-plugin-protocol = { path = "../streamdeck-plugin-protocol", version = "0.1.0" }
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+ts-rs = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "time"] }

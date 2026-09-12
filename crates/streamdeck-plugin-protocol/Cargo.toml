@@ -1,0 +1,30 @@
+[package]
+name = "streamdeck-plugin-protocol"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+description = "Stream Deck plugin WebSocket protocol types, registration, and transport."
+readme = "README.md"
+keywords = ["streamdeck", "elgato", "plugin", "websocket"]
+categories = ["api-bindings"]
+
+[features]
+default = ["tokio-transport"]
+tokio-transport = ["dep:tokio", "dep:tokio-tungstenite", "dep:tokio-util", "dep:async-trait", "dep:futures"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+async-trait = { workspace = true, optional = true }
+futures = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+tokio-tungstenite = { workspace = true, optional = true }
+tokio-util = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "time"] }

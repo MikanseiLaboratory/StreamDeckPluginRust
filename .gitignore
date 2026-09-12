@@ -1,0 +1,8 @@
+/target
+**/*.rs.bk
+.idea/
+.vscode/
+samples/counter-sample/pi/node_modules/
+samples/counter-sample/dev.flowingspdg.countersample.rust.sdPlugin/bin/
+samples/counter-sample/dev.flowingspdg.countersample.rust.sdPlugin/ui/
+artifacts/
