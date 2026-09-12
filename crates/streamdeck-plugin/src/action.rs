@@ -157,6 +157,236 @@ pub trait Action: Send + Sync + 'static {
         _payload: &TouchTapPayload,
         _ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
+            Ok(())
+    }
+}
+
+/// Keypad handlers. Implement this for keys so rust-analyzer can complete methods.
+#[async_trait]
+pub trait KeypadAction: Send + Sync + 'static {
+    /// Settings deserialized from Stream Deck.
+    type Settings: Serialize + DeserializeOwned + Default + Clone + Send + Sync + 'static;
+    /// Shared plugin state.
+    type State: Send + Sync + 'static;
+
+    /// `willAppear`
+    async fn on_will_appear(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `willDisappear`
+    async fn on_will_disappear(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `didReceiveSettings` after typed settings are applied.
+    async fn on_did_receive_settings(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// Fired after settings change. `previous` is the last snapshot.
+    async fn on_settings_changed(
+        &mut self,
+        _previous: &Self::Settings,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `propertyInspectorDidAppear`
+    async fn on_property_inspector_did_appear(
+        &mut self,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `propertyInspectorDidDisappear`
+    async fn on_property_inspector_did_disappear(
+        &mut self,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `sendToPlugin`
+    async fn on_property_inspector_message(
+        &mut self,
+        _payload: &Value,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `titleParametersDidChange`
+    async fn on_title_parameters_did_change(
+        &mut self,
+        _payload: &TitleParametersPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `didReceiveResources`
+    async fn on_did_receive_resources(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `keyDown`
+    async fn on_key_down(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `keyUp`
+    async fn on_key_up(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+}
+
+/// Encoder handlers. Implement this for dials / touch strips.
+#[async_trait]
+pub trait EncoderAction: Send + Sync + 'static {
+    /// Settings deserialized from Stream Deck.
+    type Settings: Serialize + DeserializeOwned + Default + Clone + Send + Sync + 'static;
+    /// Shared plugin state.
+    type State: Send + Sync + 'static;
+
+    /// `willAppear`
+    async fn on_will_appear(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `willDisappear`
+    async fn on_will_disappear(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `didReceiveSettings` after typed settings are applied.
+    async fn on_did_receive_settings(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// Fired after settings change. `previous` is the last snapshot.
+    async fn on_settings_changed(
+        &mut self,
+        _previous: &Self::Settings,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `propertyInspectorDidAppear`
+    async fn on_property_inspector_did_appear(
+        &mut self,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `propertyInspectorDidDisappear`
+    async fn on_property_inspector_did_disappear(
+        &mut self,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `sendToPlugin`
+    async fn on_property_inspector_message(
+        &mut self,
+        _payload: &Value,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `titleParametersDidChange`
+    async fn on_title_parameters_did_change(
+        &mut self,
+        _payload: &TitleParametersPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `didReceiveResources`
+    async fn on_did_receive_resources(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `dialDown`
+    async fn on_dial_down(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `dialUp`
+    async fn on_dial_up(
+        &mut self,
+        _payload: &ActionPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `dialRotate`
+    async fn on_dial_rotate(
+        &mut self,
+        _payload: &DialRotatePayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        Ok(())
+    }
+
+    /// `touchTap`
+    async fn on_touch_tap(
+        &mut self,
+        _payload: &TouchTapPayload,
+        _ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
         Ok(())
     }
 }

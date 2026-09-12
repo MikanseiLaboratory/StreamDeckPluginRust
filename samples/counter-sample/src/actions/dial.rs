@@ -1,6 +1,7 @@
 use serde_json::Value;
 use streamdeck_plugin::{
-    streamdeck_action, ActionContext, ActionPayload, DialRotatePayload, Result, TriggerDescription,
+    streamdeck_action, ActionContext, ActionPayload, DialRotatePayload, EncoderAction, Result,
+    TriggerDescription,
 };
 
 use crate::contracts::{CountChangedMessage, CounterSettings, PropertyInspectorCommand};
@@ -13,13 +14,12 @@ pub struct DialAction;
     uuid = "dev.flowingspdg.countersample.rust.dial",
     settings = CounterSettings,
     state = AppState,
-    controller = Encoder,
 )]
-impl DialAction {
+impl EncoderAction for DialAction {
     async fn on_will_appear(
         &mut self,
         _payload: &ActionPayload,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         ctx.set_trigger_description(TriggerDescription {
             rotate: Some("Change shared count".into()),
@@ -32,7 +32,7 @@ impl DialAction {
     async fn on_dial_rotate(
         &mut self,
         payload: &DialRotatePayload,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         ctx.state()
             .store
@@ -43,7 +43,7 @@ impl DialAction {
     async fn on_dial_down(
         &mut self,
         _payload: &ActionPayload,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         ctx.state().store.add(-ctx.state().store.count());
         Ok(())
@@ -51,20 +51,23 @@ impl DialAction {
 
     async fn on_settings_changed(
         &mut self,
-        _prev: &CounterSettings,
-        ctx: &ActionContext<'_>,
+        _prev: &Self::Settings,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         refresh(ctx)
     }
 
-    async fn on_property_inspector_did_appear(&mut self, ctx: &ActionContext<'_>) -> Result<()> {
+    async fn on_property_inspector_did_appear(
+        &mut self,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
         send_count(ctx)
     }
 
     async fn on_property_inspector_message(
         &mut self,
         payload: &Value,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         apply_inspector(ctx, payload);
         send_count(ctx)

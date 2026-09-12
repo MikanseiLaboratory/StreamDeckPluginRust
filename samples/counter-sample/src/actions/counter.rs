@@ -1,5 +1,5 @@
 use serde_json::Value;
-use streamdeck_plugin::{streamdeck_action, ActionContext, ActionPayload, Result};
+use streamdeck_plugin::{streamdeck_action, ActionContext, ActionPayload, KeypadAction, Result};
 
 use crate::contracts::{CountChangedMessage, CounterSettings, PropertyInspectorCommand};
 use crate::store::AppState;
@@ -11,13 +11,12 @@ pub struct CounterAction;
     uuid = "dev.flowingspdg.countersample.rust.counter",
     settings = CounterSettings,
     state = AppState,
-    controller = Keypad,
 )]
-impl CounterAction {
+impl KeypadAction for CounterAction {
     async fn on_will_appear(
         &mut self,
         _payload: &ActionPayload,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         refresh(ctx)
     }
@@ -25,7 +24,7 @@ impl CounterAction {
     async fn on_key_down(
         &mut self,
         _payload: &ActionPayload,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         ctx.state().store.add(ctx.settings().increment.max(1));
         refresh(ctx)
@@ -33,20 +32,23 @@ impl CounterAction {
 
     async fn on_settings_changed(
         &mut self,
-        _prev: &CounterSettings,
-        ctx: &ActionContext<'_>,
+        _prev: &Self::Settings,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         refresh(ctx)
     }
 
-    async fn on_property_inspector_did_appear(&mut self, ctx: &ActionContext<'_>) -> Result<()> {
+    async fn on_property_inspector_did_appear(
+        &mut self,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
         send_count(ctx)
     }
 
     async fn on_property_inspector_message(
         &mut self,
         payload: &Value,
-        ctx: &ActionContext<'_>,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
         apply_inspector(ctx, payload);
         send_count(ctx)

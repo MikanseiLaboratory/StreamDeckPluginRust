@@ -4,7 +4,10 @@ use crate::action::ActionEvent;
 use crate::dispatch::Dispatcher;
 use crate::protocol::{json as sdjson, CommandSender, IncomingMessage};
 use crate::registry::Registry;
-use crate::{Action, ActionContext, ActionPayload, Result, TypedInstance};
+use crate::{
+    streamdeck_action, Action, ActionContext, ActionInstance, ActionPayload, KeypadAction, Result,
+    TypedInstance,
+};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
@@ -237,6 +240,25 @@ async fn will_disappear_removes_instance() {
     assert!(dispatcher.instance("ctx").is_none());
 }
 
+#[derive(Default)]
+struct MacroKeypadAction;
+
+#[streamdeck_action(
+    uuid = "dev.test.macro-keypad",
+    settings = RecordingSettings,
+    state = RecordingState,
+)]
+impl KeypadAction for MacroKeypadAction {
+    async fn on_key_down(
+        &mut self,
+        _payload: &ActionPayload,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
+        ctx.state().push("macro-keyDown");
+        Ok(())
+    }
+}
+
 #[test]
 fn action_event_from_message_reads_key_down() {
     let message = parse(r#"{"event":"keyDown","payload":{"settings":{"increment":1}}}"#);
@@ -244,4 +266,17 @@ fn action_event_from_message_reads_key_down() {
         ActionEvent::from_message(&message),
         Some(ActionEvent::KeyDown(_))
     ));
+}
+
+#[tokio::test]
+async fn streamdeck_action_macro_impls_keypad_trait() {
+    let state = Arc::new(RecordingState::default());
+    let mut instance = TypedInstance::<MacroKeypadAction>::new(Arc::clone(&state));
+    let (tx, _rx) = tokio::sync::mpsc::unbounded_channel();
+    let sender = CommandSender::new(tx, "plugin");
+    instance
+        .handle(ActionEvent::KeyDown(ActionPayload::default()), sender)
+        .await
+        .unwrap();
+    assert!(state.snapshot().contains(&"macro-keyDown".to_string()));
 }

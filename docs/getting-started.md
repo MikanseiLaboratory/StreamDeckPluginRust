@@ -13,7 +13,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ## 2. Define an action
 
 ```rust
-use streamdeck_plugin::{streamdeck_action, ActionContext, ActionPayload, Result};
+use streamdeck_plugin::{streamdeck_action, ActionContext, ActionPayload, KeypadAction, Result};
 
 #[derive(Default)]
 struct CounterAction;
@@ -22,10 +22,13 @@ struct CounterAction;
     uuid = "dev.example.myplugin.counter",
     settings = CounterSettings,
     state = AppState,
-    controller = Keypad,
 )]
-impl CounterAction {
-    async fn on_key_down(&mut self, _payload: &ActionPayload, ctx: &ActionContext<'_>) -> Result<()> {
+impl KeypadAction for CounterAction {
+    async fn on_key_down(
+        &mut self,
+        _payload: &ActionPayload,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
         ctx.update_settings(|settings| settings.count += 1)?;
         ctx.set_title(ctx.settings().count.to_string())
     }
@@ -34,7 +37,7 @@ impl CounterAction {
 
 Settings are kept in sync automatically. When the Property Inspector changes a field, `on_settings_changed` runs. When the plugin updates settings, call `ctx.update_settings` so Stream Deck and the inspector both receive the new values.
 
-The same `Action` trait can be implemented by hand. Register it with `.add_action::<CounterAction>()`.
+The same handlers live on `Action` if you want one trait for every event. Register a handwritten impl with `.add_action::<CounterAction>()`.
 
 ## 3. Start the host
 

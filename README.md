@@ -36,17 +36,20 @@ struct CounterAction;
     uuid = "dev.example.plugin.counter",
     settings = CounterSettings,
     state = AppState,
-    controller = Keypad,
 )]
-impl CounterAction {
-    async fn on_key_down(&mut self, _p: &ActionPayload, ctx: &ActionContext<'_>) -> Result<()> {
+impl KeypadAction for CounterAction {
+    async fn on_key_down(
+        &mut self,
+        _p: &ActionPayload,
+        ctx: &ActionContext<'_, Self::Settings, Self::State>,
+    ) -> Result<()> {
         ctx.state().store.add(ctx.settings().increment.max(1));
-        ctx.show_ok()
+        Ok(())
     }
 }
 ```
 
-`Action` is also public if you prefer to implement it by hand and call `.add_action::<T>()`.
+Use `EncoderAction` for dials. `Action` is also public if you prefer to implement every handler by hand and call `.add_action::<T>()`.
 
 ## Sample
 

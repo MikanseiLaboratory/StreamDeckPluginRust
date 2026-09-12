@@ -4,8 +4,11 @@
 
 #![deny(missing_docs)]
 
+extern crate self as streamdeck_plugin;
+
 pub use async_trait::async_trait;
 pub use inventory;
+pub use serde_json;
 pub use streamdeck_plugin_protocol as protocol;
 pub use streamdeck_plugin_protocol::{
     parse_action_payload, parse_dial_rotate, parse_title_parameters, parse_touch_tap,
@@ -30,7 +33,9 @@ mod logging;
 mod manifest;
 mod registry;
 
-pub use action::{Action, ActionEvent, ActionInstance, TypedInstance};
+pub use action::{
+    Action, ActionEvent, ActionInstance, EncoderAction, KeypadAction, TypedInstance,
+};
 pub use builder::{Plugin, PluginBuilder};
 pub use context::{ActionContext, ActionIdentity};
 pub use lifecycle::{PluginLifecycle, PluginService};
