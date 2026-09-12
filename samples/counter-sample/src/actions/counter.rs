@@ -28,8 +28,7 @@ impl CounterAction {
         ctx: &ActionContext<'_>,
     ) -> Result<()> {
         ctx.state().store.add(ctx.settings().increment.max(1));
-        refresh(ctx)?;
-        ctx.show_ok()
+        refresh(ctx)
     }
 
     async fn on_settings_changed(

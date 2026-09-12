@@ -46,7 +46,7 @@ impl DialAction {
         ctx: &ActionContext<'_>,
     ) -> Result<()> {
         ctx.state().store.add(-ctx.state().store.count());
-        ctx.show_ok()
+        Ok(())
     }
 
     async fn on_settings_changed(
