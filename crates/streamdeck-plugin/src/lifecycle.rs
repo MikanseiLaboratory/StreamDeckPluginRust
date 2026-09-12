@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use serde_json::Value;
 
-use crate::protocol::DeviceInfo;
+use crate::protocol::{CommandSender, DeviceInfo};
 use crate::Result;
 
 /// Plugin-wide events that are not bound to an action instance.
@@ -54,15 +54,22 @@ pub trait PluginLifecycle: Send + Sync + 'static {
 }
 
 /// Optional start/stop hooks for shared services.
+///
+/// Put connections on [`crate::PluginBuilder::state`] and implement this so every
+/// action sees the same client through `ctx.state()`. `sender` is the plugin-wide
+/// Stream Deck command channel (`IStreamDeckConnection` in the C# SDK).
 #[async_trait]
 pub trait PluginService: Send + Sync + 'static {
     /// Called before the WebSocket loop starts.
-    async fn start(&mut self) -> Result<()> {
+    async fn start(&self, _sender: CommandSender) -> Result<()> {
         Ok(())
     }
 
     /// Called after the WebSocket loop ends.
-    async fn stop(&mut self) -> Result<()> {
+    async fn stop(&self) -> Result<()> {
         Ok(())
     }
 }
+
+#[async_trait]
+impl PluginService for () {}

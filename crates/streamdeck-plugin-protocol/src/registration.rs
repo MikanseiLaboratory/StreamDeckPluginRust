@@ -31,10 +31,14 @@ impl RegistrationArguments {
 
         let mut index = 0;
         while index < args.len() {
+            let key = args[index].as_str();
+            if !key.starts_with('-') {
+                index += 1;
+                continue;
+            }
             if index + 1 >= args.len() {
                 break;
             }
-            let key = args[index].as_str();
             let value = args[index + 1].as_str();
             index += 2;
             match key {

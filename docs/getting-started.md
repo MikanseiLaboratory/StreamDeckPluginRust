@@ -42,7 +42,7 @@ The same handlers live on `Action` if you want one trait for every event. Regist
 ## 3. Start the host
 
 ```rust
-streamdeck_plugin::Plugin::builder(std::env::args().skip(1))
+streamdeck_plugin::Plugin::builder(std::env::args())
     .state(AppState::default())
     .add_registered_actions()
     .run()
@@ -51,11 +51,26 @@ streamdeck_plugin::Plugin::builder(std::env::args().skip(1))
 
 Stream Deck launches your executable with `-port`, `-pluginUUID`, `-registerEvent`, and `-info`. The host connects to `ws://127.0.0.1:{port}` and registers itself.
 
-## 4. Share state
+## 4. Share connections
 
-Put shared connections and counters on `AppState` and hold them in `Arc` internally. Inject that state once on the builder. Every action instance receives `ctx.state()`.
+Put shared clients on `AppState`. Every action sees the same instance through `ctx.state()`. Implement `PluginService` on that state to start and stop the remote socket with the process. The `sender` argument is the plugin-wide Stream Deck channel, so a background task can update titles without going through an action.
 
-Implement `PluginService` and pass it to `.service(...)` when something must start and stop with the process.
+```rust
+#[async_trait]
+impl PluginService for AppState {
+    async fn start(&self, sender: CommandSender) -> Result<()> {
+        self.obs.connect().await?;
+        let _ = sender;
+        Ok(())
+    }
+
+    async fn stop(&self) -> Result<()> {
+        self.obs.disconnect().await
+    }
+}
+```
+
+`.service(...)` is for extra start/stop hooks that are not part of `AppState`.
 
 ## 5. Package for Windows and macOS
 

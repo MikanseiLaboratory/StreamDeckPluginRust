@@ -1,5 +1,7 @@
 use std::sync::atomic::{AtomicI32, Ordering};
 
+use streamdeck_plugin::PluginService;
+
 #[derive(Default)]
 pub struct CounterStore {
     count: AtomicI32,
@@ -19,3 +21,5 @@ impl CounterStore {
 pub struct AppState {
     pub store: CounterStore,
 }
+
+impl PluginService for AppState {}

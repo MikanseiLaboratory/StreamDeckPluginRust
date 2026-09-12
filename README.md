@@ -21,7 +21,7 @@ Property Inspector bindings live in [`@mikanseilaboratory/streamdeck-pi-client`]
 ```rust
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    streamdeck_plugin::Plugin::builder(std::env::args().skip(1))
+    streamdeck_plugin::Plugin::builder(std::env::args())
         .state(AppState::default())
         .add_registered_actions()
         .run()

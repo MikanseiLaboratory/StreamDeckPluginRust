@@ -33,9 +33,7 @@ mod logging;
 mod manifest;
 mod registry;
 
-pub use action::{
-    Action, ActionEvent, ActionInstance, EncoderAction, KeypadAction, TypedInstance,
-};
+pub use action::{Action, ActionEvent, ActionInstance, EncoderAction, KeypadAction, TypedInstance};
 pub use builder::{Plugin, PluginBuilder};
 pub use context::{ActionContext, ActionIdentity};
 pub use lifecycle::{PluginLifecycle, PluginService};

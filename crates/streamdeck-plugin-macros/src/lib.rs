@@ -204,7 +204,9 @@ fn action_bridge(
     uuid: &LitStr,
     handlers: &[&str],
 ) -> proc_macro2::TokenStream {
-    let methods = handlers.iter().map(|name| forward_method(self_ty, &trait_path, name));
+    let methods = handlers
+        .iter()
+        .map(|name| forward_method(self_ty, &trait_path, name));
     quote! {
         #[::streamdeck_plugin::async_trait]
         impl ::streamdeck_plugin::Action for #self_ty {

@@ -20,6 +20,8 @@ pub struct Plugin;
 
 impl Plugin {
     /// Start a builder from process arguments.
+    ///
+    /// Pass [`std::env::args()`](std::env::args) as-is. The program name is ignored.
     pub fn builder(args: impl IntoIterator<Item = impl AsRef<str>>) -> PluginBuilder<()> {
         PluginBuilder {
             arguments: RegistrationArguments::parse(args)
@@ -96,7 +98,9 @@ impl<S: Send + Sync + 'static> PluginBuilder<S> {
         self.skip_manifest = true;
         self
     }
+}
 
+impl<S: PluginService + Send + Sync + 'static> PluginBuilder<S> {
     /// Connect, dispatch, and shut down.
     pub async fn run(mut self) -> Result<()> {
         let state = self.state.take().ok_or_else(|| {
@@ -114,16 +118,18 @@ impl<S: Send + Sync + 'static> PluginBuilder<S> {
         let sender = connection.sender();
         logging::init_tracing(sender.clone(), &self.arguments.plugin_uuid);
 
+        let state = Arc::new(state);
+        state.start(sender.clone()).await?;
+        for service in &self.services {
+            service.start(sender.clone()).await?;
+        }
+
         let dispatcher = Arc::new(Mutex::new(Dispatcher::new(
             self.registry,
-            Arc::new(state) as Arc<dyn Any + Send + Sync>,
+            Arc::clone(&state) as Arc<dyn Any + Send + Sync>,
             sender,
             self.lifecycle,
         )));
-
-        for service in &mut self.services {
-            service.start().await?;
-        }
 
         let token = CancellationToken::new();
         let shutdown = token.clone();
@@ -147,10 +153,13 @@ impl<S: Send + Sync + 'static> PluginBuilder<S> {
             )
             .await;
 
-        for service in self.services.iter_mut().rev() {
+        for service in self.services.iter().rev() {
             if let Err(error) = service.stop().await {
                 tracing::error!(error = %error, "failed to stop plugin service");
             }
+        }
+        if let Err(error) = state.stop().await {
+            tracing::error!(error = %error, "failed to stop plugin state service");
         }
         run_result.map_err(Into::into)
     }

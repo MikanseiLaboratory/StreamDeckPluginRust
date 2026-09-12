@@ -100,6 +100,22 @@ fn registration_info_deserializes() {
 }
 
 #[test]
+fn registration_parse_skips_program_name() {
+    let args = RegistrationArguments::parse([
+        r"C:\Plugins\counter.exe",
+        "-port",
+        "28196",
+        "-pluginUUID",
+        "ABC123",
+        "-registerEvent",
+        "registerPlugin",
+    ])
+    .unwrap();
+    assert_eq!(args.port, 28196);
+    assert_eq!(args.plugin_uuid, "ABC123");
+}
+
+#[test]
 fn command_serialization_uses_event_property() {
     let command = OutgoingCommand::new(CommandNames::SET_TITLE)
         .with_context("c")

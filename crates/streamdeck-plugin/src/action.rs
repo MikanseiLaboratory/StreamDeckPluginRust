@@ -157,7 +157,7 @@ pub trait Action: Send + Sync + 'static {
         _payload: &TouchTapPayload,
         _ctx: &ActionContext<'_, Self::Settings, Self::State>,
     ) -> Result<()> {
-            Ok(())
+        Ok(())
     }
 }
 
